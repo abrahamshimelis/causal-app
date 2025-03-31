@@ -1,7 +1,7 @@
 const VALID_OPERATORS = ['+', '-', '*', '/', '^', '(', ')'];
 
 export const isValidOperator = (value) => {
-  return VALID_OPERATORS.includes(value.trim());
+  return VALID_OPERATORS.includes(value?.trim());
 };
 
 export const isValidNumber = (value) => {

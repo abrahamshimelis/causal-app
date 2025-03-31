@@ -1,21 +1,26 @@
-const dummyValues = {
-    revenue: 1000,
-    cost: 300,
-  };
+export const evaluateFormula = (tokens) => {
+    if (!tokens || tokens.length === 0) return '';
   
-  export const evaluateFormula = (tokens) => {
     try {
-      const expr = tokens
-        .map((t) => {
-          if (t.type === 'operand') return t.label;
-          if (t.type === 'tag') return dummyValues[t.label] ?? 0;
+      const expression = tokens
+        .map((token) => {
+          if (token.type === 'number' || token.type === 'operand') {
+            return token.label;
+          }
+  
+          if (token.type === 'tag') {
+            return token.value;
+          }
+  
           return '';
         })
-        .join('');
-      // Evaluate using Function constructor (safe only for trusted input)
-      return new Function(`return ${expr}`)();
-    } catch {
-      return 'Invalid Expression';
+        .join(' ');
+  
+      // Safe evaluation
+      const result = new Function(`return ${expression}`)();
+      return result;
+    } catch (err) {
+      return 'Invalid formula';
     }
   };
   

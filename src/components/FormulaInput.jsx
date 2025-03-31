@@ -15,6 +15,7 @@ const FormulaInput = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const { data: suggestions = [] } = useAutocomplete(suggestionInput);
+  console.log(suggestions)
 
     useEffect(() => {
         setSuggestionInput(input)
@@ -31,13 +32,13 @@ const FormulaInput = () => {
     if (isValidOperator(lastChar)) {
       // Save number before operand
       if (isValidNumber(beforeLast)) {
-        addToken({ type: "number", label: beforeLast });
+        addToken({ type: "number", label: beforeLast, value: beforeLast });
       } else if (beforeLast) {
         setInput(val);
         return;
       }
 
-      addToken({ type: "operand", label: lastChar });
+      addToken({ type: "operand", label: lastChar, value: lastChar });
 
       // Trigger suggestions even if input is empty
       setInput("");
@@ -48,7 +49,7 @@ const FormulaInput = () => {
 
     // If user typed number then started typing a variable → save number
     if (input && isValidNumber(input) && !isValidNumber(val)) {
-      addToken({ type: "number", label: input });
+      addToken({ type: "number", label: input, value: input });
       setInput(val[val.length - 1]); // carry over last char
       return;
     }
@@ -61,8 +62,15 @@ const FormulaInput = () => {
     const trimmed = input.trim();
 
     if (e.key === "Enter" && trimmed) {
-      addToken({ type: "tag", label: trimmed });
+      if (isValidNumber(trimmed)) {
+        addToken({ type: "number", label: trimmed, value: parseFloat(trimmed) });
+      } else if (isValidOperator(trimmed)) {
+        addToken({ type: "operand", label: trimmed });
+      } else {
+        addToken({ type: "tag", label: trimmed, value: 5 }); // example default value
+      }
       setInput("");
+      setShowSuggestions(false);
     } else if (e.key === "Backspace" && input === "") {
       deleteLastToken();
     }
@@ -87,12 +95,12 @@ const FormulaInput = () => {
         !isValidOperator(input) &&
         suggestions.length > 0 && (
           <div className="absolute top-full left-0 mt-1 w-full max-w-3xl bg-white border rounded shadow z-10 max-h-64 overflow-auto">
-            {suggestions.map((sug) => (
+            {suggestions.map((sug, idx) => (
               <div
-                key={sug.id}
+                key={idx}
                 className="px-4 py-2 cursor-pointer hover:bg-gray-100"
                 onClick={() => {
-                  addToken({ type: "tag", label: sug.name, value: sug.value });
+                  addToken({ type: "tag", label: sug.name, value: idx });  // example default value
                   setInput("");
                   setShowSuggestions(false);
                 }}
