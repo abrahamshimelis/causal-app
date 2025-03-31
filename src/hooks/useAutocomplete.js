@@ -6,10 +6,16 @@ export const useAutocomplete = (query) => {
     queryKey: ['autocomplete', query],
     queryFn: async () => {
       const { data } = await axios.get(
-        `https://api.example.com/autocomplete?q=${query}`
+        'https://652f91320b8d8ddac0b2b62b.mockapi.io/autocomplete'
       );
-      return data.suggestions;
+
+      // Client-side filtering based on the `name` field
+      const filtered = data.filter((item) =>
+        item.name.toLowerCase().includes(query.toLowerCase())
+      );
+
+      return filtered;
     },
-    enabled: !!query,
+    enabled: !!query, // Only fetch if query is not empty
   });
 };
